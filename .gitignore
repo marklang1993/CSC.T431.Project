@@ -1,0 +1,4 @@
+# For latex
+*.aux
+*.log
+*.gz
