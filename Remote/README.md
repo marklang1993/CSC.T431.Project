@@ -1,5 +1,6 @@
 # Advanced System Software UI
-The current code is edited from AOSLogo.ino from [M5Samples_Arduino](https://github.com/titech-aos/M5Samples_Arduino)
+The current code is edited from AOSLogo.ino from [M5Samples_Arduino](https://github.com/titech-aos/M5Samples_Arduino).
+
 Below are the essence of [M5Stack/Free_Font_Demo.ino at master · m5stack/M5Stack · GitHub](https://github.com/m5stack/M5Stack/blob/master/examples/Advanced/Display/Free_Font_Demo/Free_Font_Demo.ino)* and [M5Stack Documentation](https://media.readthedocs.org/pdf/m5stack/latest/m5stack.pdf), take a look at them for more details.
 ## Fonts
 Fonts defined are from “Free_Fonts.h” in “Free_Font_Demo” from M5Stack library.
@@ -36,7 +37,9 @@ There are two ways of printing text, using `print()`method or using `drawString(
 Print  the text at position (x, y).
 #### Parameters
 **(string) text:** the string need to print.
+
 **(int) x:** the x coordinate of destination.
+
 **(int) y:** the y coordinate of destination.
 #### Example
 ```c
@@ -44,13 +47,16 @@ Print  the text at position (x, y).
 lcd.print('this is a print text function', 80, 80)
 ```
 
+
 ### drawString()
 `Lcd.drawString(‘text’, [x, y])`
 #### Description
 Print  the text at position (x, y).
 #### Parameters
 **(string) text:** the string need to print.
+
 **(int) x:** the x coordinate of destination.
+
 **(int) y:** the y coordinate of destination.
 #### Example
 ```c
