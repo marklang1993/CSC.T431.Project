@@ -5,5 +5,6 @@
 
 #define DELAY_LED       1000
 #define DELAY_SCAN      100
+#define DELAY_DRIVE     1
 
 #endif

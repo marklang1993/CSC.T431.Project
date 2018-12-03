@@ -6,9 +6,11 @@
 // Output Ports
 #define LED_PORT        21
 #define RELAY_PORT      16
+
 #define IN1_PORT        3
-#define IN2_PORT        1
+#define IN2_PORT        22
 #define PWM_PORT        17
+
 #define SPEAKER_PORT    25      // Used to shut up the speaker
 
 // Input Ports

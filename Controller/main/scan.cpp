@@ -41,7 +41,7 @@ void scan(void)
     Serial.println(voltage2);
 
     // TODO: check the values of voltage and current
-    digitalWrite(RELAY_PORT, HIGH);
+    digitalWrite(RELAY_PORT, HIGH); // turn on relay
 
     delay(DELAY_SCAN);
 }
