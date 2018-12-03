@@ -35,11 +35,13 @@ void scan(void)
     // Read 2 ADC ports
     voltage1 = analogRead(VM_PORT);
     voltage2 = analogRead(CM_PORT);
+    /*
     Serial.print("Voltage: ");
     Serial.print(voltage1);
     Serial.print(", ");
     Serial.println(voltage2);
-
+    */
+    
     // TODO: check the values of voltage and current
     digitalWrite(RELAY_PORT, HIGH); // turn on relay
 
