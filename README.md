@@ -5,3 +5,7 @@ Final Project of Course "Advance System Software".
 Shared: For temporary files or file exchange.<br>
 Remote: For UI.<br>
 Controller: For motor controller.<br>
+Manual: For manuals, including software and hardware.<br>
+Hardware: For hardware design documents.<br>
+Summary: For submitted project summary.<br>
+

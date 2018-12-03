@@ -18,9 +18,9 @@ typedef struct {
 // Task Descriptor Table
 static taskDescriptor tdt[] {
     {ledTask, "LED", 4096, NULL, 1, NULL, 0}, // LED
-    {commTask, "Communication", 4096, NULL, 2, NULL, 0} // Communication
+    {commTask, "Communication", 8192, NULL, 2, NULL, 0}, // Communication
+    {scanTask, "Scan", 8192, NULL, 3, NULL, 0} // Circuit Scan
 };
-
 
 void taskInit() {
     // All tasks should be initialized here
@@ -45,7 +45,6 @@ void otherInit() {
     Serial.begin(115200);
     delay(10);
 }
-
 
 void setup() {
     // Initialization

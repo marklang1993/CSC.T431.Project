@@ -28,7 +28,7 @@ void commInit(void)
     // Wait for WIFI connection
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
-        Serial.print(".");
+        // Serial.print(".");
     }
 
     // WIFI connected, print config info.
@@ -68,5 +68,5 @@ static void sendrecv(WiFiClient* pClient)
     char sendData[256];
     char recvData[256];
 
-    pClient->write(data);
+    pClient->write(sendData);
 }
