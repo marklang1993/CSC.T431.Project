@@ -13,8 +13,7 @@ Fonts defined are from “Free_Fonts.h” in “Free_Font_Demo” from M5Stack l
 #### Description
 Set the colour of printing text. Background can be omitted. 
 
-TFT preset colours are: 
-[image:77143965-D99A-4CB4-B75C-6E6007C8BED4-662-00001CBB5A18E9AF/CCDCC328-64B4-48C8-B936-A883A95BE6CD.png]
+TFT preset colours are in the [Cheat Sheet](https://github.com/Kongduino/M5CheatSheet).
 
 You can also use custom colours, but remember to convert the hex value from **RGB888** to **RGB565**.
 [Online Conversion Tool](http://www.barth-dev.de/online/rgb565-color-picker/)
