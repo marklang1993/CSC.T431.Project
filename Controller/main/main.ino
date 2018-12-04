@@ -18,7 +18,7 @@ typedef struct {
 // Task Descriptor Table
 static taskDescriptor tdt[] {
     {ledTask, "LED", 4096, NULL, 1, NULL, 0}, // LED
-    {commTask, "Communication", 8192, NULL, 2, NULL, 0}, // Communication
+    {commTask, "Communication", 16384, NULL, 2, NULL, 0}, // Communication
     {scanTask, "Scan", 8192, NULL, 3, NULL, 0}, // Circuit Scan
     {driveTask, "Drive", 8192, NULL, 4, NULL, 0} // Motor drive
     

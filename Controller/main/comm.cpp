@@ -2,6 +2,7 @@
 #include <WiFi.h>
 #include "ipc.h"
 #include "comm.h"
+#include "taskDelay.h"
 
 // Queues for ipc
 extern QueueHandle_t sendQueueDrive;
@@ -13,10 +14,15 @@ extern QueueHandle_t recvQueueScan;
 static const char* ssid = "TP-LINK_D9D564";
 static const char* password = "advanced123";
 
+// Server & Client
+static WiFiServer server(80);
+static WiFiClient client;
+
 // Private functions
 static void sendrecv(WiFiClient* pClient);
-static int collectData(void);
+static void collectData(struct commSendData* pCommSendData);
 static bool sendCommand(struct msgCommand* pMsgComm);
+static void sendCommandByCommunication(struct commRecvData* pCommRecvData);
 
 void commTask(void *pvParameters)
 {
@@ -35,7 +41,7 @@ void commInit(void)
 
     // Wait for WIFI connection
     while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
+        delay(DELAY_COMM_WIFI_CONNECT);
         Serial.print(".");
     }
 
@@ -44,57 +50,78 @@ void commInit(void)
     Serial.println("WiFi connected");
     Serial.println("IP address: ");
     Serial.println(WiFi.localIP());
+
+    // Start the server
+    server.begin();
 }
 
 void comm(void)
 {
-    static WiFiServer server(80);
-    static WiFiClient client;
-
     if (client) {
         // If client is existed
         if (client.connected()) {
             // If client is connected
             Serial.println("Connected to client");
+            // Communicate
             sendrecv(&client);
-            delay(500);
+            // Stop - FIN
+            client.stop();
+            delay(DELAY_COMM_SENDRECV);
         }
     }
     else {
         // If client does not existed
         do {
             // Wait for the client
-
-            // Serial.print("Wait for client");
-
-            int test = collectData();
-            if (test % 200 == 0) {
-                struct msgCommand msgComm;
-                msgComm.type = IPC_R_SETRELAY;
-                msgComm.value = 1;
-                while (!sendCommand(&msgComm));
-            } else if (test % 100 == 0) {
-                struct msgCommand msgComm;
-                msgComm.type = IPC_R_SETRELAY;
-                msgComm.value = 0;
-                while (!sendCommand(&msgComm));
-            }
+            Serial.println("Wait for client");
 
             client = server.available();
-            delay(100);
+            delay(DELAY_COMM_CONNECT);
         } while(!client);
     }
 }
 
 static void sendrecv(WiFiClient* pClient)
 {
-    char sendData[256];
-    char recvData[128];
+    struct commSendData sendData;
+    struct commRecvData recvData;
 
-    pClient->write(sendData);
+    // Collect all data from SCAN and DRIVE
+    collectData(&sendData);
+
+    // Send data
+    pClient->println(
+        String(sendData.voltage) + "," +
+        String(sendData.current) + "," +
+        String(sendData.relayStatus) + "," +
+        String(sendData.ratio) + "," +
+        String(sendData.motorStatus)
+        );
+
+    // Receive data
+    String stringReceived = pClient->readStringUntil('\n');
+    // TEST
+    Serial.print("recvData: ");
+    Serial.println(stringReceived);
+
+    // Convert data from stringReceived to "recvData"
+    int indexOfComma = stringReceived.indexOf(',');
+    String commandString = stringReceived.substring(0, indexOfComma);
+    String subCommandString = stringReceived.substring(indexOfComma + 1);
+    recvData.command = commandString.toInt();
+    recvData.subCommand = subCommandString.toInt();
+
+    // TEST
+    Serial.print("Command: ");
+    Serial.println(recvData.command);
+    Serial.print("SubCommand: ");
+    Serial.println(recvData.subCommand);
+
+    // Dispatch the received command
+    sendCommandByCommunication(&recvData);
 }
 
-static int collectData(void)
+static void collectData(struct commSendData* pCommSendData)
 {
     static struct msgDrive msgDriveStatus;
     static struct msgScan msgScanStatus;
@@ -114,6 +141,13 @@ static int collectData(void)
         }
     }
 
+    // Prepare sending data for communication
+    pCommSendData->voltage = msgScanStatus.voltage;
+    pCommSendData->current = msgScanStatus.current;
+    pCommSendData->relayStatus = msgScanStatus.relayStatus;
+    pCommSendData->ratio = msgDriveStatus.ratio;
+    pCommSendData->motorStatus = msgDriveStatus.motorStatus;
+
     // TEST
     Serial.print("Voltage: ");
     Serial.println(msgScanStatus.voltage);
@@ -125,7 +159,6 @@ static int collectData(void)
     Serial.println(msgDriveStatus.ratio);
     Serial.print("Motor Status: ");
     Serial.println(msgDriveStatus.motorStatus);
-    return msgScanStatus.voltage;
 }
 
 static bool sendCommand(struct msgCommand* pMsgComm)
@@ -150,4 +183,42 @@ static bool sendCommand(struct msgCommand* pMsgComm)
         }
     }
     return false;
+}
+
+static void sendCommandByCommunication(struct commRecvData* pCommRecvData)
+{
+    struct msgCommand msgComm;
+
+    switch(pCommRecvData->command)
+    {
+        case 0:     // Command: Empty
+            break;
+        case 1:     // Command: Stop
+            msgComm.type = IPC_R_STOP;
+            msgComm.value = 0;
+            sendCommand(&msgComm);
+            break;
+        case 2:     // Command: Forward
+            msgComm.type = IPC_R_FORWARD;
+            msgComm.value = 0;
+            sendCommand(&msgComm);
+            break;
+        case 3:     // Command: Backward
+            msgComm.type = IPC_R_BACKWARD;
+            msgComm.value = 0;
+            sendCommand(&msgComm);
+            break;
+        case 4:     // Command: SetDutyRatio
+            msgComm.type = IPC_R_SETRATIO;
+            msgComm.value = pCommRecvData->subCommand;
+            sendCommand(&msgComm);
+            break;
+        case 5:     // Command: SetRelay
+            msgComm.type = IPC_R_SETRELAY;
+            msgComm.value = pCommRecvData->subCommand;
+            sendCommand(&msgComm);
+            break;
+        default:    // Unknown command
+            break;
+    }
 }
