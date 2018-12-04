@@ -1,10 +1,5 @@
 #include <M5Stack.h>
 #include "./screen1.h"
-/*
-    Edited from AOSLogo.ino from M5Samples_Arduino
-    https://github.com/titech-aos/M5Samples_Arduino.git
-*/
-// Taken from "Free_Fonts.h" in "Free_Font_Demo"
 
 void setup()
 {
