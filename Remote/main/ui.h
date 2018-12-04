@@ -8,3 +8,7 @@ void drawButtonBar()
     M5.Lcd.fillRect(109, 205, 2, 40, FRONT_DARK);
     M5.Lcd.fillRect(209, 205, 2, 40, FRONT_DARK);
 }
+void drawBackground()
+{
+    M5.Lcd.fillScreen(BG_LIGHT);
+}

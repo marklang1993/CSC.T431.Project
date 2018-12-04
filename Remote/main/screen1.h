@@ -58,9 +58,9 @@ void showText()
         M5.Lcd.fillRect(0, i * 33 + 38, 320, 2, BG_DARK);
     }
 }
-void startRender()
+void startRender1()
 {
-    M5.Lcd.fillScreen(BG_LIGHT);
+    drawBackground();
     drawButtonBar();
     showText();
 }

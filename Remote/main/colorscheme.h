@@ -4,6 +4,7 @@ PS: Colours need to be transfered from RGB888 to RGB565 which is used in this TF
 */
 #define FSSO12 &FreeSansOblique12pt7b
 #define FSS12 &FreeSans12pt7b
+#define FSS18 &FreeSans18pt7b
 #define FSS9 &FreeSans9pt7b
 #define BG_LIGHT 0x324B
 #define BG_DARK 0x29EA
