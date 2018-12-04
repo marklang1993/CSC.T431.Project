@@ -3,10 +3,11 @@
 #include "ipc.h"
 #include "comm.h"
 
-
 // Queues for ipc
 extern QueueHandle_t sendQueueDrive;
 extern QueueHandle_t recvQueueDrive;
+extern QueueHandle_t sendQueueScan;
+extern QueueHandle_t recvQueueScan;
 
 // WIFI credential
 static const char* ssid = "TP-LINK_D9D564";
@@ -43,15 +44,6 @@ void commInit(void)
     Serial.println("WiFi connected");
     Serial.println("IP address: ");
     Serial.println(WiFi.localIP());
-
-    // TESTING PURPOSE
-    struct msgCommand msgComm;
-    msgComm.type = IPC_R_SETRATIO;
-    msgComm.value = 100;
-    while (!sendCommand(&msgComm));
-
-    msgComm.type = IPC_R_FORWARD;
-    while (!sendCommand(&msgComm));
 }
 
 void comm(void)
@@ -75,16 +67,21 @@ void comm(void)
 
             // Serial.print("Wait for client");
 
-            // TESTING PURPOSE
-            if (collectData() == 100)
-            {
+            int test = collectData();
+            if (test % 200 == 0) {
                 struct msgCommand msgComm;
-                msgComm.type = IPC_R_BACKWARD;
+                msgComm.type = IPC_R_SETRELAY;
+                msgComm.value = 1;
+                while (!sendCommand(&msgComm));
+            } else if (test % 100 == 0) {
+                struct msgCommand msgComm;
+                msgComm.type = IPC_R_SETRELAY;
+                msgComm.value = 0;
                 while (!sendCommand(&msgComm));
             }
 
             client = server.available();
-            delay(10);
+            delay(100);
         } while(!client);
     }
 }
@@ -92,29 +89,43 @@ void comm(void)
 static void sendrecv(WiFiClient* pClient)
 {
     char sendData[256];
-    char recvData[256];
+    char recvData[128];
 
     pClient->write(sendData);
 }
 
 static int collectData(void)
 {
-    struct msgDrive msgDriveStatus;
+    static struct msgDrive msgDriveStatus;
+    static struct msgScan msgScanStatus;
 
     // Gather info. from Drive Task
     if (sendQueueDrive != NULL) {
         if (uxQueueSpacesAvailable(sendQueueDrive) < IPC_QUEUE_SIZE) {
             // Some message are ready to pick up
             xQueueReceive(sendQueueDrive, (void *)&msgDriveStatus, (TickType_t)0);
-            Serial.print("Ratio: ");
-            Serial.println(msgDriveStatus.ratio);
-            Serial.print("Motor Status: ");
-            Serial.println(msgDriveStatus.motorStatus);
-
-            return msgDriveStatus.ratio;
         }
     }
-    // TODO: Gather info. from Scan Task
+    // Gather info. from Scan Task
+    if (sendQueueScan != NULL) {
+        if (uxQueueSpacesAvailable(sendQueueScan) < IPC_QUEUE_SIZE) {
+            // Some message are ready to pick up
+            xQueueReceive(sendQueueScan, (void *)&msgScanStatus, (TickType_t)0);
+        }
+    }
+
+    // TEST
+    Serial.print("Voltage: ");
+    Serial.println(msgScanStatus.voltage);
+    Serial.print("Current: ");
+    Serial.println(msgScanStatus.current);
+    Serial.print("Relay: ");
+    Serial.println(msgScanStatus.relayStatus);
+    Serial.print("Ratio: ");
+    Serial.println(msgDriveStatus.ratio);
+    Serial.print("Motor Status: ");
+    Serial.println(msgDriveStatus.motorStatus);
+    return msgScanStatus.voltage;
 }
 
 static bool sendCommand(struct msgCommand* pMsgComm)
@@ -130,9 +141,13 @@ static bool sendCommand(struct msgCommand* pMsgComm)
         }
     } else {
         // Command for Scan
-        // TODO
+        if (recvQueueScan != NULL) {
+            if (uxQueueSpacesAvailable(recvQueueScan) == IPC_QUEUE_SIZE) {
+                // Ready to send command
+                xQueueSend(recvQueueScan, (void *)pMsgComm, (TickType_t)0);
+                return true;
+            }
+        }
     }
-
-
     return false;
 }

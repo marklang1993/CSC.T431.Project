@@ -167,7 +167,7 @@ static void outputPWM(void)
 
 void drive(void)
 {
-    // Message sending
+    // Report status of the motor
     struct msgDrive msgStatus;
     if (uxQueueSpacesAvailable(sendQueueDrive) == IPC_QUEUE_SIZE)
     {
