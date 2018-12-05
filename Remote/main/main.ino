@@ -32,7 +32,7 @@ void loop()
         if (isScreen1)
             ;
         else
-            next();
+            ok();
     }
 
     M5.update();
