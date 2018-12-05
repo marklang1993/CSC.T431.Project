@@ -36,10 +36,11 @@ public class RemoteClient {
 
         double voltage = ((double)Integer.parseInt(receivedArray[0])) / 1000.0d;
         double current = ((double)Integer.parseInt(receivedArray[1])) / 1000.0d;
+        double temperature =  ((double)Integer.parseInt(receivedArray[5])) / 100.0d;
 
         System.out.println(
-                String.format("Voltage: %5.3fV, Current: %5.3fA, Relay: %s, Ratio: %s, Motor: %s, Temp.: %s",
-                        voltage, current, receivedArray[2], receivedArray[3], receivedArray[4], receivedArray[5])
+                String.format("Voltage: %5.3fV, Current: %5.3fA, Relay: %s, Ratio: %s, Motor: %s, Temp.: %4.2fC",
+                        voltage, current, receivedArray[2], receivedArray[3], receivedArray[4], temperature)
         );
 
         // Send response
