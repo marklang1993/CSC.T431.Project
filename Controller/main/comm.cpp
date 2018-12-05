@@ -74,7 +74,7 @@ void comm(void)
         // If client does not existed
         do {
             // Wait for the client
-            Serial.println("Wait for client");
+            // Serial.println("Wait for client");
 
             client = server.available();
             delay(DELAY_COMM_CONNECT);

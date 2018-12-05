@@ -1,4 +1,4 @@
-#include "DHT12.h"
+#include "DHT12.h"  // External library
 
 #include "i2c.h"
 #include "ipc.h"
@@ -16,7 +16,6 @@ void i2cTask(void *pvParameters)
     while(1){ i2c(); }
 }
 
-
 void i2cInit(void)
 {
     // init. I2C
@@ -28,11 +27,12 @@ void i2cInit(void)
 
 void i2c(void)
 {
-    float aTemperature;
+    float rawTemperature;
     int temperature = 0;
 
-    aTemperature = dht12.readTemperature();
-    temperature = (int)aTemperature;
+    // Read raw temperature and convert it to temperature
+    rawTemperature = dht12.readTemperature(CELSIUS);
+    temperature = (int)(rawTemperature * 100.0f);
 
     // # Report data from I2C
     struct msgI2C msgStatus;
