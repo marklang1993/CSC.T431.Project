@@ -15,8 +15,11 @@ extern QueueHandle_t sendQueueI2C;
 static const char* ssid = "TP-LINK_D9D564";
 static const char* password = "advanced123";
 
+// Server port
+static const int port = 80;
+
 // Server & Client
-static WiFiServer server(80);
+static WiFiServer server(port);
 static WiFiClient client;
 
 // Private functions
@@ -205,29 +208,29 @@ static void sendCommandByCommunication(struct commRecvData* pCommRecvData)
 
     switch(pCommRecvData->command)
     {
-        case 0:     // Command: Empty
+        case COMM_EMPTY:        // Command: Empty
             break;
-        case 1:     // Command: Stop
+        case COMM_STOP:         // Command: Stop
             msgComm.type = IPC_R_STOP;
             msgComm.value = 0;
             sendCommand(&msgComm);
             break;
-        case 2:     // Command: Forward
+        case COMM_FORWARD:      // Command: Forward
             msgComm.type = IPC_R_FORWARD;
             msgComm.value = 0;
             sendCommand(&msgComm);
             break;
-        case 3:     // Command: Backward
+        case COMM_BACKWARD:     // Command: Backward
             msgComm.type = IPC_R_BACKWARD;
             msgComm.value = 0;
             sendCommand(&msgComm);
             break;
-        case 4:     // Command: SetDutyRatio
+        case COMM_SETRATIO:     // Command: SetDutyRatio
             msgComm.type = IPC_R_SETRATIO;
             msgComm.value = pCommRecvData->subCommand;
             sendCommand(&msgComm);
             break;
-        case 5:     // Command: SetRelay
+        case COMM_SETRELAY:     // Command: SetRelay
             msgComm.type = IPC_R_SETRELAY;
             msgComm.value = pCommRecvData->subCommand;
             sendCommand(&msgComm);

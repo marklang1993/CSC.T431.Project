@@ -1,15 +1,25 @@
 #include <M5stack.h>
 
-#include "./screen1.h"
-#include "./ui.h"
-#include "./colorscheme.h"
+#include "screen1.h"
+#include "ui.h"
+#include "colorscheme.h"
+#include "comm.h"
+#include "ipc.h"
 
-const String vars[6] = {"Voltage", "Current", "Relay", "Motor", "Power", "Temperature"};
-const int data[6] = {12345, 12345, 1, 1, 123, 1234};
-String unitArr[2] = {"V", "A"};
+extern QueueHandle_t recvQueueDisplay;
+
+bool isRelay = false;
+static String vars[6] = {"Voltage", "Current", "Relay", "Motor", "Power", "Temperature"};
+static String unitArr[] = {"V", "A", "C"};
+
+static void receiveInfo(int* pData);
 
 void showText()
 {
+    // Get data from IPC
+    static int data[6] = {0, 0, 0, 0, 0, 0};
+    receiveInfo(data);
+
     for (int i = 0; i < 6; i++)
     {
         char param;
@@ -39,7 +49,8 @@ void showText()
         {
             M5.Lcd.setFreeFont(FSSO12);
             M5.Lcd.setTextColor(TEXT_LIGHT);
-            M5.Lcd.print(data[i] == 0 ? "Close" : "Open");
+            isRelay = data[i] == 0;
+            M5.Lcd.print(isRelay ? "Close" : "Open");
             break;
         }
         case 3:
@@ -68,7 +79,7 @@ void showText()
             M5.Lcd.setFreeFont(FSSO12);
             M5.Lcd.setTextColor(TEXT_LIGHT);
             int f = data[i] / 100;
-            M5.Lcd.print(String(f) + '.' + (data[i] - f * 100) + " C");
+            M5.Lcd.print(String(f) + '.' + (data[i] - f * 100) + " " + unitArr[i - 3]);
             break;
         }
         case 4:
@@ -100,4 +111,26 @@ void startRender1()
     drawButtonBar();
     showText();
     drawRadioOn(160, 75);
+}
+
+static void receiveInfo(int* pData)
+{
+    struct msgDisplay msgComm;
+
+    if (recvQueueDisplay != NULL)
+    {
+        // Queue is ready
+        if (uxQueueSpacesAvailable(recvQueueDisplay) < IPC_QUEUE_SIZE) {
+            // Pick up message from "Comm"
+            xQueueReceive(recvQueueDisplay, (void *)&msgComm, (TickType_t)0);
+
+            // Put value
+            *pData = msgComm.voltage;
+            *(pData + 1) = msgComm.current;
+            *(pData + 2) = msgComm.relayStatus;
+            *(pData + 3) = msgComm.motorStatus;
+            *(pData + 4) = msgComm.ratio;
+            *(pData + 5) = msgComm.temperature;
+        }
+    }
 }

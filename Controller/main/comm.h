@@ -4,6 +4,13 @@
 #define COMM_SENDBUFF_SIZE      256
 #define COMM_RECVBUFF_SIZE      256
 
+#define COMM_EMPTY              0
+#define COMM_STOP               1
+#define COMM_FORWARD            2
+#define COMM_BACKWARD           3
+#define COMM_SETRATIO           4
+#define COMM_SETRELAY           5
+
 struct commSendData {
         int voltage;
         int current;

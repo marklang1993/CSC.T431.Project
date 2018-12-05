@@ -1,18 +1,26 @@
 #include <M5stack.h>
 
-#include "./ui.h"
-#include "./screen2.h"
-#include "./colorscheme.h"
+#include "ui.h"
+#include "screen2.h"
+#include "colorscheme.h"
+#include "comm.h"
+#include "ipc.h"
+
+extern QueueHandle_t sendQueueDisplay;
+extern bool isRelay;
 
 static String commands[5] = {"Stop", "Forward", "Backward", "SetPower", "SetRelay"};
 static int selected = 0;
 static int percentage = 0;
-static bool relay = false;
 static bool isDataSelecting = false;
+
+static void sendCommand(int command, int value);
 
 void updateRelay()
 {
-    if (relay)
+    Serial.print("updateRelay: ");
+    Serial.println(isRelay);
+    if (isRelay)
     {
         drawRadioOn(200, 160);
     }
@@ -125,15 +133,37 @@ void ok()
 {
     if (isDataSelecting)
     {
-        //send data;
         update2(selected);
         isDataSelecting = false;
+
+        // SEND COMMAND
+        // DutyRatio
+        sendCommand(COMM_SETRATIO, percentage);
     }
     else
     {
         if (selected < 3)
-            //send command
-            ;
+        {
+            // SEND COMMAND
+            // Stop(0), Forward(1), Backward(2)
+            switch (selected)
+            {
+                case 0:
+                    sendCommand(COMM_STOP, 0);
+                    break;
+
+                case 1:
+                    sendCommand(COMM_FORWARD, 0);
+                    break;
+                
+                case 2:
+                    sendCommand(COMM_BACKWARD, 0);
+                    break;
+                
+                default:
+                    break;
+            }
+        }
         else if (selected == 3)
         {
             isDataSelecting = true;
@@ -141,9 +171,28 @@ void ok()
         }
         else if (selected == 4)
         {
-            relay = !relay;
+            isRelay = !isRelay;
             updateRelay();
-            //send command
+            // SEND COMMAND
+            // Relay
+            sendCommand(COMM_SETRELAY, isRelay ? 1 : 0);            
+        }
+    }
+}
+
+static void sendCommand(int command, int value)
+{
+    struct msgCommand msgComm;
+
+    if (sendQueueDisplay != NULL)
+    {
+        // Queue is ready
+        if (uxQueueSpacesAvailable(sendQueueDisplay) == IPC_QUEUE_SIZE) {
+            // Ready to send command
+            msgComm.type = command;
+            msgComm.value = value;
+            // Send
+            xQueueSend(sendQueueDisplay, (void *)&msgComm, (TickType_t)0);
         }
     }
 }
