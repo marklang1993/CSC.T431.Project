@@ -1,10 +1,20 @@
-const String commands[5] = {"Stop", "Forward", "Backward", "SetDutyRatio", "SetRelay"};
+const String commands[5] = {"Stop", "Forward", "Backward", "SetPower", "SetRelay"};
 int selected = 0;
 int percentage = 0;
 bool relay = false;
 bool isDataSelecting = false;
-bool isRelaySelecting = false;
 
+void updateRelay()
+{
+    if (relay)
+    {
+        drawRadioOn(200, 160);
+    }
+    else
+    {
+        drawRadioOff(200, 160);
+    }
+}
 void update2(int selected)
 {
     // Draw static UI
@@ -49,47 +59,29 @@ void update2(int selected)
             M5.Lcd.setCursor(20, i * 70 + 45);
             M5.Lcd.print(commands[i + 2]);
         }
+        updateRelay();
     }
 }
 void startRender2()
 {
     update2(selected);
 }
-void updateDataSelection(int per, bool relay)
+
+void updateDataSelection(int per)
 {
-    if (isDataSelecting)
-    {
-        M5.Lcd.clear();
-        drawBackground();
-        drawButtonBar();
-        M5.Lcd.setTextColor(TEXT_LIGHT);
-        M5.Lcd.setFreeFont(FSS18);
-        M5.Lcd.drawString(String(per) + "%", 100, 100);
-        M5.Lcd.setFreeFont(FSS9);
-        M5.Lcd.setCursor(35, 226);
-        M5.Lcd.print("Status");
-        M5.Lcd.setCursor(140, 226);
-        M5.Lcd.print("10%");
-        M5.Lcd.setCursor(240, 226);
-        M5.Lcd.print("OK");
-    }
-    else if (isRelaySelecting)
-    {
-        M5.Lcd.clear();
-        drawBackground();
-        drawButtonBar();
-        M5.Lcd.setTextColor(TEXT_LIGHT);
-        M5.Lcd.setFreeFont(FSS18);
-        String outputStr = relay ? "On" : "Off";
-        M5.Lcd.drawString(String(outputStr), 100, 100);
-        M5.Lcd.setFreeFont(FSS9);
-        M5.Lcd.setCursor(35, 226);
-        M5.Lcd.print("Status");
-        M5.Lcd.setCursor(140, 226);
-        M5.Lcd.print("Toggle");
-        M5.Lcd.setCursor(240, 226);
-        M5.Lcd.print("OK");
-    }
+    M5.Lcd.clear();
+    drawBackground();
+    drawButtonBar();
+    M5.Lcd.setTextColor(TEXT_LIGHT);
+    M5.Lcd.setFreeFont(FSS18);
+    M5.Lcd.drawString(String(per) + "%", 100, 100);
+    M5.Lcd.setFreeFont(FSS9);
+    M5.Lcd.setCursor(35, 226);
+    M5.Lcd.print("Status");
+    M5.Lcd.setCursor(140, 226);
+    M5.Lcd.print("10%");
+    M5.Lcd.setCursor(240, 226);
+    M5.Lcd.print("OK");
 }
 void next()
 {
@@ -103,13 +95,9 @@ void next()
         {
             percentage += 10;
         }
-        updateDataSelection(percentage, false);
+        updateDataSelection(percentage);
     }
-    else if (isRelaySelecting)
-    {
-        relay = !relay;
-        updateDataSelection(0, relay);
-    }
+
     else
     {
         if (selected < 4)
@@ -131,12 +119,6 @@ void ok()
         update2(selected);
         isDataSelecting = false;
     }
-    else if (isRelaySelecting)
-    {
-        //send data;
-        update2(selected);
-        isRelaySelecting = false;
-    }
     else
     {
         if (selected < 3)
@@ -145,12 +127,13 @@ void ok()
         else if (selected == 3)
         {
             isDataSelecting = true;
-            updateDataSelection(percentage, false);
+            updateDataSelection(percentage);
         }
         else if (selected == 4)
         {
-            isRelaySelecting = true;
-            updateDataSelection(0, relay);
+            relay = !relay;
+            updateRelay();
+            //send command
         }
     }
 }
