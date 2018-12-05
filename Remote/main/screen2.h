@@ -17,9 +17,9 @@ void update2(int selected)
     M5.Lcd.print("Next");
     M5.Lcd.setCursor(240, 226);
     M5.Lcd.print("OK");
-    if (selected <= 3)
+    M5.Lcd.setFreeFont(FSS18);
+    if (selected < 3)
     {
-        M5.Lcd.setFreeFont(FSS18);
         for (int i = 0; i < 3; i++)
         {
             M5.Lcd.setTextColor(TEXT_LIGHT);
@@ -32,6 +32,20 @@ void update2(int selected)
             M5.Lcd.print(commands[i]);
         }
     }
+    else
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            M5.Lcd.setTextColor(TEXT_LIGHT);
+            if (selected - 3 == i)
+            {
+                M5.Lcd.fillRect(0, 70 * i, 320, 65, BG_DARK);
+                M5.Lcd.setTextColor(FRONT_LIGHT);
+            }
+            M5.Lcd.setCursor(20, i * 70 + 45);
+            M5.Lcd.print(commands[i + 3]);
+        }
+    }
 }
 void startRender2()
 {
@@ -39,7 +53,7 @@ void startRender2()
 }
 void next()
 {
-    if (selected < 2)
+    if (selected < 5)
     {
         selected++;
     }
@@ -48,4 +62,12 @@ void next()
         selected = 0;
     }
     update2(selected);
+}
+void ok()
+{
+    if (selected < 4)
+        ;
+    else
+    {
+        }
 }

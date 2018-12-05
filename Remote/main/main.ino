@@ -27,6 +27,13 @@ void loop()
         else
             next();
     }
+    if (M5.BtnC.wasPressed())
+    {
+        if (isScreen1)
+            ;
+        else
+            next();
+    }
 
     M5.update();
 }
