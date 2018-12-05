@@ -28,6 +28,9 @@ struct msgScan {
         int voltage;
         int current;
         int relayStatus;
+};
+
+struct msgI2C {
         int temperature;
 };
 

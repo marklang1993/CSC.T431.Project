@@ -9,6 +9,7 @@ extern QueueHandle_t sendQueueDrive;
 extern QueueHandle_t recvQueueDrive;
 extern QueueHandle_t sendQueueScan;
 extern QueueHandle_t recvQueueScan;
+extern QueueHandle_t sendQueueI2C;
 
 // WIFI credential
 static const char* ssid = "TP-LINK_D9D564";
@@ -126,6 +127,7 @@ static void collectData(struct commSendData* pCommSendData)
 {
     static struct msgDrive msgDriveStatus;
     static struct msgScan msgScanStatus;
+    static struct msgI2C msgI2CStatus;
 
     // Gather info. from Drive Task
     if (sendQueueDrive != NULL) {
@@ -142,13 +144,21 @@ static void collectData(struct commSendData* pCommSendData)
         }
     }
 
+    // Gather info. from I2C Task
+    if (sendQueueI2C != NULL) {
+        if (uxQueueSpacesAvailable(sendQueueI2C) < IPC_QUEUE_SIZE) {
+            // Some message are ready to pick up
+            xQueueReceive(sendQueueI2C, (void *)&msgI2CStatus, (TickType_t)0);
+        }
+    }
+
     // Prepare sending data for communication
     pCommSendData->voltage = msgScanStatus.voltage;
     pCommSendData->current = msgScanStatus.current;
     pCommSendData->relayStatus = msgScanStatus.relayStatus;
     pCommSendData->ratio = msgDriveStatus.ratio;
     pCommSendData->motorStatus = msgDriveStatus.motorStatus;
-    pCommSendData->temperature = msgScanStatus.temperature;
+    pCommSendData->temperature = msgI2CStatus.temperature;
 
     // TEST
     Serial.print("Voltage: ");
@@ -162,7 +172,7 @@ static void collectData(struct commSendData* pCommSendData)
     Serial.print("Motor Status: ");
     Serial.println(msgDriveStatus.motorStatus);
     Serial.print("Temperature: ");
-    Serial.println(msgScanStatus.temperature);
+    Serial.println(msgI2CStatus.temperature);
 }
 
 static bool sendCommand(struct msgCommand* pMsgComm)

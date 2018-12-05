@@ -14,12 +14,12 @@ public class RemoteClient {
                         "running the date service on port 80:");
                         */
 
-        mainbody("1,0");
+//        mainbody("5,1");
 
-//        while(true)
-//        {
-//            mainbody("0,0");
-//        }
+        while(true)
+        {
+            mainbody("0,0");
+        }
 
     }
 

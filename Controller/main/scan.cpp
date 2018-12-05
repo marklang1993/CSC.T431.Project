@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <Wire.h>
 
 #include "scan.h"
 #include "port.h"
@@ -29,9 +28,6 @@ void scanInit(void)
     */
     dacWrite(SPEAKER_PORT, 0);
 
-    // init. I2C
-    Wire.begin();
-
     // init. RELAY_PORT as OUTPUT to control relay
     pinMode(RELAY_PORT, OUTPUT);
     digitalWrite(RELAY_PORT, LOW); // turn off relay until everything is set up
@@ -51,14 +47,10 @@ void scan(void)
     float voltageDiff;
     int voltage;
     int current;
-    static int temperature = 0; // TEST
 
     // Read 2 ADC ports
     voltage1 = READ_ADC(VM_PORT);
     voltage2 = READ_ADC(CM_PORT);
-
-    // Read I2C
-    ++temperature; // TEST
 
     // Calculate voltage
     voltage = (int)(voltage1 * 6.0f);
@@ -118,7 +110,6 @@ void scan(void)
         msgStatus.voltage = voltage;
         msgStatus.current = current;
         msgStatus.relayStatus = relayStatus ? 1 : 0;
-        msgStatus.temperature = temperature;
         // Send
         xQueueSend(sendQueueScan, (void *)&msgStatus, (TickType_t)0);
     }

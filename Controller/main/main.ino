@@ -1,5 +1,5 @@
 #include "led.h"
-#include "display.h"
+#include "i2c.h"
 #include "comm.h"
 #include "scan.h"
 #include "drive.h"
@@ -19,8 +19,9 @@ typedef struct {
 static taskDescriptor tdt[] {
     {ledTask, "LED", 4096, NULL, 1, NULL, 0}, // LED
     {commTask, "Communication", 16384, NULL, 2, NULL, 0}, // Communication
-    {scanTask, "Scan", 8192, NULL, 3, NULL, 0}, // Circuit Scan
-    {driveTask, "Drive", 8192, NULL, 4, NULL, 0} // Motor drive
+    {i2cTask, "I2C", 4096, NULL, 3, NULL, 0}, // I2C
+    {scanTask, "Scan", 8192, NULL, 4, NULL, 0}, // Circuit Scan
+    {driveTask, "Drive", 8192, NULL, 5, NULL, 0} // Motor drive
     
 };
 

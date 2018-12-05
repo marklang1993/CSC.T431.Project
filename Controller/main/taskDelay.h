@@ -5,6 +5,7 @@
 
 #define DELAY_LED               1000
 #define DELAY_SCAN              100
+#define DELAY_I2C               50
 #define DELAY_DRIVE             1
 
 #define DELAY_COMM_WIFI_CONNECT 500
