@@ -63,4 +63,5 @@ void startRender1()
     drawBackground();
     drawButtonBar();
     showText();
+    drawRadioOff(160, 75);
 }
