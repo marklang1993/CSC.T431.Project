@@ -4,6 +4,8 @@
 #include "taskDelay.h"
 #include "ipc.h"
 
+#define READ_ADC(x) ((((float)analogRead(x)) / ((float)SCAN_ADC_MAX)) * 3.51f * 1000.f)
+
 // Relay controlling status
 static bool relayStatus = true;
 
@@ -40,17 +42,22 @@ void scanInit(void)
 
 void scan(void)
 {
-    static int voltage1, voltage2 = 0; // TEST: static must be removed
+    float voltage1, voltage2 = 0.0f;
+    float voltageDiff;
+    int voltage;
     int current;
-    
-    // TEST
-    ++voltage1;
-    ++voltage2;
-/*
+
     // Read 2 ADC ports
-    voltage1 = analogRead(VM_PORT);
-    voltage2 = analogRead(CM_PORT);
-*/
+    voltage1 = READ_ADC(VM_PORT);
+    voltage2 = READ_ADC(CM_PORT);
+
+    // Calculate voltage
+    voltage = (int)(voltage1 * 6.0f);
+    
+    // Calculate current
+    voltageDiff = voltage1 - voltage2;
+    if (voltageDiff < 0.0f) voltageDiff = 0.0f;
+    current = (int)voltageDiff;
 
     // # Message receiving
     struct msgCommand msgCommand;
@@ -75,10 +82,19 @@ void scan(void)
         // Receiving queue is empty -> NO command
         if (relayStatus == true)
         {
-            // TODO: check the values of voltage and current
-            relayStatus = true;
+            // PROTECT FUNCTIONALITY -> Cut off the relay
+            if (voltage < SCAN_V_MIN || voltage > SCAN_V_MAX) {
+                // Voltage is out of range [SCAN_V_MIN, SCAN_V_MAX]
+                relayStatus = false;
+            } else if (current > SCAN_A_MAX) {
+                // Current is more than SCAN_A_MAX
+                relayStatus = false;
+            } else {
+                // Voltage and current is in the right range
+                relayStatus = true;
+            }
         }
-        // Since the relay is turned off due to some reasons,
+        // Since the relay is turned off due to some reasons of safety,
         // it should not be automatically turned on.
     }
 
@@ -90,8 +106,8 @@ void scan(void)
     if (uxQueueSpacesAvailable(sendQueueScan) == IPC_QUEUE_SIZE)
     {
         // Sending queue is empty -> collect status
-        msgStatus.voltage = voltage1;
-        msgStatus.current = voltage2;
+        msgStatus.voltage = voltage;
+        msgStatus.current = current;
         msgStatus.relayStatus = relayStatus ? 1 : 0;
         // Send
         xQueueSend(sendQueueScan, (void *)&msgStatus, (TickType_t)0);
