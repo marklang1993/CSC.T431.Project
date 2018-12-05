@@ -8,7 +8,7 @@
 
 // some constants
 #define DRIVE_MAX_COUNT         10
-#define DRIVE_MAX_BUSY_COUNT    100
+#define DRIVE_MAX_BUSY_COUNT    250
 
 // Functions
 void driveTask(void *pvParameters);

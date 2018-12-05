@@ -28,6 +28,7 @@ struct msgScan {
         int voltage;
         int current;
         int relayStatus;
+        int temperature;
 };
 
 struct msgCommand {

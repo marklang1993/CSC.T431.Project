@@ -95,7 +95,8 @@ static void sendrecv(WiFiClient* pClient)
         String(sendData.current) + "," +
         String(sendData.relayStatus) + "," +
         String(sendData.ratio) + "," +
-        String(sendData.motorStatus)
+        String(sendData.motorStatus) + "," +
+        String(sendData.temperature)
         );
 
     // Receive data
@@ -147,6 +148,7 @@ static void collectData(struct commSendData* pCommSendData)
     pCommSendData->relayStatus = msgScanStatus.relayStatus;
     pCommSendData->ratio = msgDriveStatus.ratio;
     pCommSendData->motorStatus = msgDriveStatus.motorStatus;
+    pCommSendData->temperature = msgScanStatus.temperature;
 
     // TEST
     Serial.print("Voltage: ");
@@ -159,6 +161,8 @@ static void collectData(struct commSendData* pCommSendData)
     Serial.println(msgDriveStatus.ratio);
     Serial.print("Motor Status: ");
     Serial.println(msgDriveStatus.motorStatus);
+    Serial.print("Temperature: ");
+    Serial.println(msgScanStatus.temperature);
 }
 
 static bool sendCommand(struct msgCommand* pMsgComm)

@@ -4,11 +4,11 @@
 // All port definitions should be here
 
 // Output Ports
-#define LED_PORT        21
+#define LED_PORT        19
 #define RELAY_PORT      16
 
 #define IN1_PORT        3
-#define IN2_PORT        22
+#define IN2_PORT        23
 #define PWM_PORT        17
 
 #define SPEAKER_PORT    25      // Used to shut up the speaker

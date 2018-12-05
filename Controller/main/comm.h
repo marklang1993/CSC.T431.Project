@@ -10,6 +10,7 @@ struct commSendData {
         int relayStatus;
         int ratio;
         int motorStatus;
+        int temperature;
 };
 struct commRecvData {
         int command;

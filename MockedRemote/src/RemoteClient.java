@@ -1,6 +1,3 @@
-import com.sun.tools.javac.util.ArrayUtils;
-
-import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.InputStreamReader;
@@ -17,7 +14,7 @@ public class RemoteClient {
                         "running the date service on port 80:");
                         */
 
-        mainbody("5,1");
+        mainbody("1,0");
 
 //        while(true)
 //        {
@@ -41,8 +38,8 @@ public class RemoteClient {
         double current = ((double)Integer.parseInt(receivedArray[1])) / 1000.0d;
 
         System.out.println(
-                String.format("Voltage: %5.3fV, Current: %5.3fA, Relay: %s, Ratio: %s, Motor: %s",
-                        voltage, current, receivedArray[2], receivedArray[3], receivedArray[4])
+                String.format("Voltage: %5.3fV, Current: %5.3fA, Relay: %s, Ratio: %s, Motor: %s, Temp.: %s",
+                        voltage, current, receivedArray[2], receivedArray[3], receivedArray[4], receivedArray[5])
         );
 
         // Send response
