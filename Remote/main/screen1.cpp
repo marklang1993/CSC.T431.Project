@@ -49,7 +49,7 @@ void showText()
         {
             M5.Lcd.setFreeFont(FSSO12);
             M5.Lcd.setTextColor(TEXT_LIGHT);
-            isRelay = data[i] == 0;
+            isRelay = data[i] != 0;
             M5.Lcd.print(isRelay ? "Close" : "Open");
             break;
         }
@@ -110,7 +110,7 @@ void startRender1()
     drawBackground();
     drawButtonBar();
     showText();
-    drawRadioOn(160, 75);
+    // drawRadioOn(160, 75);
 }
 
 static void receiveInfo(int* pData)

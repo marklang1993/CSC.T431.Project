@@ -75,8 +75,8 @@ static void commLoop()
             msgSend.voltage = data[0];
             msgSend.current = data[1];
             msgSend.relayStatus = data[2];
-            msgSend.motorStatus = data[4];
             msgSend.ratio = data[3];
+            msgSend.motorStatus = data[4];
             msgSend.temperature = data[5];
             // Send to UI - Screen 1
             xQueueSend(recvQueueDisplay, (void *)&msgSend, (TickType_t)0);
