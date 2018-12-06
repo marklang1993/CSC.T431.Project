@@ -26,13 +26,15 @@ static void displayLoop()
 {
     // Render
     if (isScreen1)
-        startRender1();
+        showText();
 
     if (M5.BtnA.wasPressed())
     {
         isScreen1 = !isScreen1;
         if (!isScreen1)
             startRender2();
+        else
+            startRender1();
     }
 
     if (M5.BtnB.wasPressed())

@@ -12,7 +12,29 @@ bool isRelay = false;
 static String vars[6] = {"Voltage", "Current", "Relay", "Motor", "Power", "Temperature"};
 static String unitArr[] = {"V", "A", "C"};
 
-static void receiveInfo(int* pData);
+static void receiveInfo(int *pData);
+
+void showStatic()
+{
+    drawBackground();
+    for (int i = 0; i < 5; i++)
+    {
+        M5.Lcd.fillRect(0, i * 33 + 38, 320, 2, BG_DARK);
+    }
+    drawButtonBar();
+    M5.Lcd.setTextColor(TEXT_LIGHT);
+    M5.Lcd.setFreeFont(FSS9);
+    M5.Lcd.setCursor(13, 226);
+    M5.Lcd.print("Commands");
+    for (int i = 0; i < 6; i++)
+    {
+        char param;
+        M5.Lcd.setCursor(20, i * 33 + 30);
+        M5.Lcd.setFreeFont(FSS12);
+        M5.Lcd.setTextColor(TEXT_DARK);
+        M5.Lcd.print(vars[i] + ": ");
+    }
+}
 
 void showText()
 {
@@ -22,11 +44,6 @@ void showText()
 
     for (int i = 0; i < 6; i++)
     {
-        char param;
-        M5.Lcd.setCursor(20, i * 33 + 30);
-        M5.Lcd.setFreeFont(FSS12);
-        M5.Lcd.setTextColor(TEXT_DARK);
-        M5.Lcd.print(vars[i] + ": ");
         switch (i)
         {
         case 0:
@@ -34,6 +51,9 @@ void showText()
             M5.Lcd.setFreeFont(FSSO12);
             M5.Lcd.setTextColor(TEXT_LIGHT);
             int f = data[i] / 1000;
+
+            M5.Lcd.fillRect(120, i * 33, 150, 32, BG_LIGHT);
+            M5.Lcd.setCursor(120, i * 33 + 30);
             M5.Lcd.print(String(f) + '.' + (data[i] - f * 1000) + " " + unitArr[i]);
             break;
         }
@@ -42,6 +62,8 @@ void showText()
             M5.Lcd.setFreeFont(FSSO12);
             M5.Lcd.setTextColor(TEXT_LIGHT);
             int f = data[i] / 1000;
+            M5.Lcd.fillRect(120, i * 33, 150, 32, BG_LIGHT);
+            M5.Lcd.setCursor(120, i * 33 + 30);
             M5.Lcd.print(String(f) + '.' + (data[i] - f * 1000) + " " + unitArr[i]);
             break;
         }
@@ -50,13 +72,25 @@ void showText()
             M5.Lcd.setFreeFont(FSSO12);
             M5.Lcd.setTextColor(TEXT_LIGHT);
             isRelay = data[i] != 0;
-            M5.Lcd.print(isRelay ? "Close" : "Open");
+            // M5.Lcd.print(isRelay ? "Close" : "Open");
+            M5.Lcd.fillRect(120, i * 33, 150, 32, BG_LIGHT);
+            M5.Lcd.setCursor(120, i * 33 + 30);
+            if (isRelay)
+            {
+                drawRadioOn(110, 75);
+            }
+            else
+            {
+                drawRadioOff(110, 75);
+            }
             break;
         }
         case 3:
         {
             M5.Lcd.setFreeFont(FSSO12);
             M5.Lcd.setTextColor(TEXT_LIGHT);
+            M5.Lcd.fillRect(120, i * 33, 150, 32, BG_LIGHT);
+            M5.Lcd.setCursor(120, i * 33 + 30);
             switch (data[i])
             {
             case 0:
@@ -79,6 +113,8 @@ void showText()
             M5.Lcd.setFreeFont(FSSO12);
             M5.Lcd.setTextColor(TEXT_LIGHT);
             int f = data[i] / 100;
+            M5.Lcd.fillRect(180, i * 33, 150, 32, BG_LIGHT);
+            M5.Lcd.setCursor(180, i * 33 + 30);
             M5.Lcd.print(String(f) + '.' + (data[i] - f * 100) + " " + unitArr[i - 3]);
             break;
         }
@@ -86,6 +122,8 @@ void showText()
         {
             M5.Lcd.setFreeFont(FSSO12);
             M5.Lcd.setTextColor(TEXT_LIGHT);
+            M5.Lcd.fillRect(120, i * 33, 150, 32, BG_LIGHT);
+            M5.Lcd.setCursor(120, i * 33 + 30);
             M5.Lcd.print(String(data[i]) + "%");
         }
         default:
@@ -94,33 +132,25 @@ void showText()
         }
         }
     }
-    M5.Lcd.setTextColor(TEXT_LIGHT);
-    M5.Lcd.setFreeFont(FSS9);
-    M5.Lcd.setCursor(13, 226);
-    M5.Lcd.print("Commands");
-
-    for (int i = 0; i < 5; i++)
-    {
-        M5.Lcd.fillRect(0, i * 33 + 38, 320, 2, BG_DARK);
-    }
 }
 
 void startRender1()
 {
-    drawBackground();
-    drawButtonBar();
+    showStatic();
+
     showText();
     // drawRadioOn(160, 75);
 }
 
-static void receiveInfo(int* pData)
+static void receiveInfo(int *pData)
 {
     struct msgDisplay msgComm;
 
     if (recvQueueDisplay != NULL)
     {
         // Queue is ready
-        if (uxQueueSpacesAvailable(recvQueueDisplay) < IPC_QUEUE_SIZE) {
+        if (uxQueueSpacesAvailable(recvQueueDisplay) < IPC_QUEUE_SIZE)
+        {
             // Pick up message from "Comm"
             xQueueReceive(recvQueueDisplay, (void *)&msgComm, (TickType_t)0);
 
