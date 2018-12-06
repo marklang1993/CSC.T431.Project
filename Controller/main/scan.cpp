@@ -86,9 +86,13 @@ void scan(void)
             // PROTECT FUNCTIONALITY -> Cut off the relay
             if (voltage < SCAN_V_MIN || voltage > SCAN_V_MAX) {
                 // Voltage is out of range [SCAN_V_MIN, SCAN_V_MAX]
+                Serial.print("Voltage Warning:");
+                Serial.println(voltage);
                 relayStatus = false;
             } else if (current > SCAN_A_MAX) {
                 // Current is more than SCAN_A_MAX
+                Serial.print("Current Warning:");
+                Serial.println(current);
                 relayStatus = false;
             } else {
                 // Voltage and current is in the right range

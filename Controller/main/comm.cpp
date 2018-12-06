@@ -65,7 +65,9 @@ void comm(void)
         // If client is existed
         if (client.connected()) {
             // If client is connected
+            /*
             Serial.println("Connected to client");
+            */
             // Communicate
             sendrecv(&client);
             // Stop - FIN
@@ -105,9 +107,12 @@ static void sendrecv(WiFiClient* pClient)
 
     // Receive data
     String stringReceived = pClient->readStringUntil('\n');
+
+    /*
     // TEST
     Serial.print("recvData: ");
     Serial.println(stringReceived);
+    */
 
     // Convert data from stringReceived to "recvData"
     int indexOfComma = stringReceived.indexOf(',');
@@ -116,11 +121,13 @@ static void sendrecv(WiFiClient* pClient)
     recvData.command = commandString.toInt();
     recvData.subCommand = subCommandString.toInt();
 
+    /*
     // TEST
     Serial.print("Command: ");
     Serial.println(recvData.command);
     Serial.print("SubCommand: ");
     Serial.println(recvData.subCommand);
+    */
 
     // Dispatch the received command
     sendCommandByCommunication(&recvData);
@@ -163,6 +170,7 @@ static void collectData(struct commSendData* pCommSendData)
     pCommSendData->motorStatus = msgDriveStatus.motorStatus;
     pCommSendData->temperature = msgI2CStatus.temperature;
 
+    /*
     // TEST
     Serial.print("Voltage: ");
     Serial.println(msgScanStatus.voltage);
@@ -176,6 +184,7 @@ static void collectData(struct commSendData* pCommSendData)
     Serial.println(msgDriveStatus.motorStatus);
     Serial.print("Temperature: ");
     Serial.println(msgI2CStatus.temperature);
+    */
 }
 
 static bool sendCommand(struct msgCommand* pMsgComm)
